@@ -26,7 +26,7 @@ export class Icon {
         this.config = config;
         this.createCanvasFunc = createCanvasFunc;
     }
-    createIcon(id: string, position: Vector3, opacity = 1, radio = 1): CanvasItem | undefined{
+    createIcon(id: string, position: Vector3, radio = 1): CanvasItem | undefined{
         let config = undefined;
         for(let i=0;i<this.config.length;i++){
             if(this.config[i].id === id){
@@ -40,7 +40,7 @@ export class Icon {
             canvas.height = config.height * radio;
             let ctx = canvas.getContext('2d');
             ctx.drawImage(this.image, config.left, config.top, config.width, config.height, 0, 0, config.width, config.height);
-            let item = new CanvasItem(position, config.width, config.height, canvas, opacity);
+            let item = new CanvasItem(position, config.width, config.height, canvas);
             return item;
         }
         return undefined;

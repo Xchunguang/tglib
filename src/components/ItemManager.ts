@@ -184,11 +184,10 @@ export class ImageItem extends Item {
 }
 export class CanvasItem extends Item {
   texture: Texture
-  constructor(position: Vector3, width: number, height: number, canvas: any, opacity = 1) {
+  constructor(position: Vector3, width: number, height: number, canvas: any) {
     let texture = new CanvasTexture(canvas)
     let material = new MeshBasicMaterial({
-      map: texture,
-      opacity: opacity
+      map: texture
     })
     material.transparent = true
     let geometry = new PlaneGeometry(width, height)

@@ -1,4 +1,5 @@
 import { Scene, Camera, WebGLRenderer, Object3D } from 'three'
+import { ItemManager } from './ItemManager'
 
 interface StageInterface {
   scene: Scene
@@ -12,6 +13,7 @@ export class Control {
   stage: StageInterface
   hudStage: StageInterface | undefined
   renderer: WebGLRenderer
+  itemManager: ItemManager
   constructor(canvas: any, stage: StageInterface, hudStage?: StageInterface | undefined) {
     this.canvas = canvas
     this.stage = stage
@@ -27,6 +29,7 @@ export class Control {
     if (window.devicePixelRatio) {
       this.renderer.setPixelRatio(window.devicePixelRatio)
     }
+    this.itemManager = new ItemManager(this);
   }
 
   /**

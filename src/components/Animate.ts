@@ -22,24 +22,26 @@ export enum AnimateMode{
     SHAPE// 形变
 }
 
-export class MoveItem{
+export class AnimateItem{
     uuid: string;
     mesh: Object3D;
     time: number;// 单次运行时间，单位秒
     type: AnimateType;
+    mode: AnimateMode;
     animate: any;
-    //位移参数：
+    //位移参数/自转参数/形变参数：
     targetPosition: Vector3 | undefined;
     delay = 0;
     easeType = Power0.easeNone;
-    constructor(mesh: Object3D, type: AnimateType, time: number){
+    constructor(mesh: Object3D, type: AnimateType, mode: AnimateMode, time: number){
         this.mesh = mesh;
         this.uuid = mesh.uuid;
         this.type = type;
         this.time = time;
+        this.mode = mode;
     }
     /**
-     * 设置位移参数
+     * 设置变换参数
      * @param position 
      */
     setTargetPosition(position: Vector3, delay=0, easeType = Power0.easeNone): void{
@@ -47,17 +49,33 @@ export class MoveItem{
         this.delay = delay;
         this.easeType = easeType;
     }
-    action(): void{
+    action(callback?: any): void{
         if(this.targetPosition !== undefined){
+            let animateObj = undefined;
+            let callbackFunc = function(){
+                if(callback){
+                    callback();
+                }
+            }
             if(this.type === AnimateType.ONCE){
-                this.animate = TweenMax.to(this.mesh.position, this.time, {x: this.targetPosition.x, y: this.targetPosition.y, z: this.targetPosition.z, delay: this.delay, ease: this.easeType});
+                animateObj = {x: this.targetPosition.x, y: this.targetPosition.y, z: this.targetPosition.z, delay: this.delay, ease: this.easeType, onComplete: callbackFunc};
             } else if (this.type === AnimateType.REPEAT){
-                this.animate = TweenMax.to(this.mesh.position, this.time, {x: this.targetPosition.x, y: this.targetPosition.y, z: this.targetPosition.z, delay: this.delay, ease: this.easeType, repeat: -1});
+                animateObj = {x: this.targetPosition.x, y: this.targetPosition.y, z: this.targetPosition.z, delay: this.delay, ease: this.easeType, repeat: -1, onComplete: callbackFunc};
             } else if (this.type === AnimateType.RETURN){
-                this.animate = TweenMax.to(this.mesh.position, this.time, {x: this.targetPosition.x, y: this.targetPosition.y, z: this.targetPosition.z, delay: this.delay, ease: this.easeType, yoyo: true});
+                animateObj = {x: this.targetPosition.x, y: this.targetPosition.y, z: this.targetPosition.z, delay: this.delay, ease: this.easeType, yoyo: true, repeat: 1, onComplete: callbackFunc};
             } else if (this.type === AnimateType.RETURNREPEAT){
-                this.animate = TweenMax.to(this.mesh.position, this.time, {x: this.targetPosition.x, y: this.targetPosition.y, z: this.targetPosition.z, delay: this.delay, ease: this.easeType, yoyo: true, repeat: -1});
+                animateObj = {x: this.targetPosition.x, y: this.targetPosition.y, z: this.targetPosition.z, delay: this.delay, ease: this.easeType, yoyo: true, repeat: -1, onComplete: callbackFunc};
             } 
+            if(animateObj !== undefined){
+                if(this.mode === AnimateMode.MOVE){
+                    this.animate = TweenMax.to(this.mesh.position, this.time, animateObj);
+                } else if(this.mode === AnimateMode.ROTATE){
+                    let eulrObj = {_x: animateObj.x, _y: animateObj.y,_z: animateObj.z}
+                    this.animate = TweenMax.to(this.mesh.rotation, this.time, eulrObj);
+                } else if(this.mode === AnimateMode.SHAPE){
+                    this.animate = TweenMax.to(this.mesh.scale, this.time, animateObj);
+                }
+            }
         }
     }
     pause(): void{
