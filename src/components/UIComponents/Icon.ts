@@ -13,19 +13,31 @@ interface IconConfig{
  */
 export class Icon {
     /**
-     * 
-     * @param image 
-     * @param config 
-     * @param createCanvasFunc wx.createCanvas 
+     *
+     * @param image
+     * @param config
+     * @param createCanvasFunc wx.createCanvas
      */
     image: HTMLImageElement;
     config: IconConfig[];
     createCanvasFunc: any;
+    /**
+     * 初始化方法
+     * @param image Image对象
+     * @param config [{id: '', width: 10, height: 10, left: 10, right: 10},...]
+     * @param createCanvasFunc wx.createCanvas
+     */
     constructor(image: HTMLImageElement, config: IconConfig[], createCanvasFunc: any){
         this.image = image;
         this.config = config;
         this.createCanvasFunc = createCanvasFunc;
     }
+    /**
+     * 创建图表Item
+     * @param id
+     * @param position Vector3
+     * @param radio 缩放，默认为1
+     */
     createIcon(id: string, position: Vector3, radio = 1): CanvasItem | undefined{
         let config = undefined;
         for(let i=0;i<this.config.length;i++){
