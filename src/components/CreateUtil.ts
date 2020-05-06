@@ -1,4 +1,7 @@
 import { Scene, Fog, Color, Camera, OrthographicCamera, PerspectiveCamera } from 'three'
+/**
+ * 创建通用场景对象工具类
+ */
 export class CreateUtil {
   static createScene(fog?: Fog | undefined, background?: number | undefined): Scene {
     let scene = new Scene()

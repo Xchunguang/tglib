@@ -12,12 +12,6 @@ interface IconConfig{
  * 适合将游戏所有icon集成在一个图片中，然后统一加载应用
  */
 export class Icon {
-    /**
-     *
-     * @param image
-     * @param config
-     * @param createCanvasFunc wx.createCanvas
-     */
     image: HTMLImageElement;
     config: IconConfig[];
     createCanvasFunc: any;

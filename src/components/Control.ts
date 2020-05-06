@@ -6,7 +6,7 @@ interface StageInterface {
   camera: Camera
 }
 /**
- * main control
+ * 控制中心
  */
 export class Control {
   canvas: any
@@ -14,6 +14,12 @@ export class Control {
   hudStage: StageInterface | undefined
   renderer: WebGLRenderer
   itemManager: ItemManager
+  /**
+   * 初始化
+   * @param canvas 唯一上屏canvas
+   * @param stage 3D主场景的舞台
+   * @param hudStage hud场景的舞台
+   */
   constructor(canvas: any, stage: StageInterface, hudStage?: StageInterface | undefined) {
     this.canvas = canvas
     this.stage = stage
@@ -33,7 +39,7 @@ export class Control {
   }
 
   /**
-   * use in animate
+   * 场景帧刷新方法，需要在每个帧循环调用
    */
   update(): void {
     let { scene, camera } = this.stage
@@ -42,17 +48,33 @@ export class Control {
       this.renderer.render(this.hudStage.scene, this.hudStage.camera)
     }
   }
+  /**
+   * 添加元素到主场景
+   * @param mesh Object3D
+   */
   addMesh(mesh: Object3D): void {
     this.stage.scene.add(mesh)
   }
+  /**
+   * 添加hud元素
+   * @param mesh
+   */
   addHudMesh(mesh: Object3D): void {
     if (this.hudStage !== undefined) {
       this.hudStage.scene.add(mesh)
     }
   }
+  /**
+   * 移除主场景元素
+   * @param mesh
+   */
   removeMesh(mesh: Object3D): void {
     this.stage.scene.remove(mesh)
   }
+  /**
+   * 移除hud场景元素
+   * @param mesh
+   */
   removeHudMesh(mesh: Object3D): void {
     if (this.hudStage !== undefined) {
       this.hudStage.scene.remove(mesh)
