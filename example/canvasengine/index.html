@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+  <div id="main">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <script src="../../dist/tglib.umd.js"></script>
+  <script>
+    let template = `<view id="container"><text id="testText" class="redText" value="hello canvas"/></view>`
+    let style = {
+      container: {
+          width: 150,
+          height: 50,
+          backgroundColor: '#ccc',
+          justContent: 'center',
+          alignItems: 'center',
+          borderRadius: 20,
+          borderColor: 'red',
+          borderWidth: 0,
+          marginTop: 20,
+          marginLeft: 20,
+      },
+      testText: {
+          color: '#ffffff',
+          width: 200,
+          height: 50,
+          lineHeight: 50,
+          fontSize: 25,
+          textAlign: 'center',
+      },
+      // 文字的最终颜色为#ff0000
+      redText: {
+          color: '#ff0000',
+      }
+  }
+  let Layout = tglib.Layout.default;
+  Layout.init(template, style);
+  let canvas = document.getElementById('canvas');
+  let context = canvas.getContext('2d');
+
+  // 设置canvas的尺寸和样式的container比例一致
+  canvas.style.width = 200 + 'px';
+  canvas.style.height = 100 + 'px';
+  canvas.width = 400;
+  canvas.height = 200;
+  Layout.updateViewPort(canvas);
+  Layout.layout(context);
+
+  const con = Layout.getElementsById('testText');
+  let textView = con[0];
+  textView.on('touchstart', (e)=>console.log(e))
+  </script>
+</body>
+
+</html>

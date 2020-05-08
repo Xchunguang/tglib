@@ -27,7 +27,7 @@ export class Icon {
         this.createCanvasFunc = createCanvasFunc;
     }
     /**
-     * 创建图表Item
+     * 创建图标Item
      * @param id
      * @param position Vector3
      * @param radio 缩放，默认为1

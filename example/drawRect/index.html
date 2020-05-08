@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+  <div id="main">
+
+  </div>
+  <script>
+    function fillRoundRect(cxt, x, y, width, height, radius, fillColor, borderColor, borderWidth) {
+      if (2 * radius > width || 2 * radius > height) { return false; }
+      cxt.save();
+      cxt.translate(x, y);
+      this.drawRoundRectPath(cxt, width, height, radius);
+      cxt.fillStyle = fillColor || '#000'; //填充色
+      cxt.strokeStyle = borderColor || "red"; //边框
+      cxt.lineWidth = borderWidth || '5'; //边框粗细
+      cxt.fill();
+      cxt.stroke();
+      cxt.restore();
+    }
+    /**
+     * 绘制带圆角的矩形
+     * @param cxt
+     * @param width
+     * @param height
+     * @param radius
+     */
+    function drawRoundRectPath(cxt, width, height, radius) {
+      cxt.beginPath();
+      cxt.arc(width - radius, height - radius, radius, 0, Math.PI / 2);
+      cxt.lineTo(radius, height);
+      cxt.arc(radius, height - radius, radius, Math.PI / 2, Math.PI);
+      cxt.lineTo(0, radius);
+      cxt.arc(radius, radius, radius, Math.PI, Math.PI * 3 / 2);
+      cxt.lineTo(width - radius, 0);
+      cxt.arc(width - radius, radius, radius, Math.PI * 3 / 2, Math.PI * 2);
+      cxt.lineTo(width, height - radius);
+      cxt.closePath();
+    }
+
+    var requestAnimFrame = function () {
+      return (
+        this.requestAnimationFrame ||
+        this.mozRequestAnimationFrame ||
+        this.oRequestAnimationFrame ||
+        this.msRequestAnimationFrame ||
+        function (callback) {
+          this.setTimeout(callback, 1000 / 60);
+        }
+      );
+    }();
+
+
+
+    var canvas = document.createElement('canvas');
+    let width = 100;
+    let height = 30;
+    canvas.width = width;
+    canvas.height = height;
+    var ctx = canvas.getContext('2d');
+
+    var drawRect = function () {
+      fillRoundRect(ctx, 0, 0, width, height, 10, '#f6774f', '#f6774f', 2);
+    }
+    drawRect();
+    document.getElementById('main').appendChild(canvas);
+
+    var radius = 0;
+    var drawStatus = true;
+    var drawCircle = function (centerX, centerY) {
+      if(drawStatus){
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+        ctx.fill();
+        radius += 2;
+        if (radius < canvas.width) {
+          requestAnimFrame(drawCircle.bind(this, centerX, centerY));
+        }
+      }
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      drawStatus = true;
+      let centerX = e.offsetX;
+      let centerY = e.offsetY;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      radius = 0;
+      drawRect();
+      drawCircle(centerX, centerY);
+    });
+    canvas.addEventListener('mouseup', () => {
+      drawStatus = false;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      radius = 0;
+      drawRect();
+    })
+  </script>
+</body>
+
+</html>

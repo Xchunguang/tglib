@@ -283,6 +283,8 @@ export class ImageItem extends Item {
  */
 export class CanvasItem extends Item {
   texture: Texture
+  canvas: any
+  position: Vector3
   constructor(position: Vector3, width: number, height: number, canvas: any) {
     let texture = new CanvasTexture(canvas)
     let material = new MeshBasicMaterial({
@@ -294,6 +296,8 @@ export class CanvasItem extends Item {
     panel.position.copy(position)
     super(width, height, panel)
     this.texture = texture
+    this.canvas = canvas
+    this.position = position
   }
   update(): void {
     if (this.mesh !== undefined) {
