@@ -8,25 +8,25 @@
 
   <script src="../../dist/tglib.umd.js"></script>
   <script>
-    let template = `<view id="container"><text id="testText" class="redText" value="hello canvas"/></view>`
+    let template = `<view id="container"><text id="testText" class="redText" value="hello canvas"></text></view>`
     let style = {
       container: {
-          width: 150,
-          height: 50,
+          width: 200,
+          height: 100,
           backgroundColor: '#ccc',
           justContent: 'center',
           alignItems: 'center',
-          borderRadius: 20,
+          borderRadius: 50,
           borderColor: 'red',
           borderWidth: 0,
-          marginTop: 20,
-          marginLeft: 20,
+          marginTop: 30,
+          marginLeft: 30,
       },
       testText: {
           color: '#ffffff',
           width: 200,
           height: 50,
-          lineHeight: 50,
+          lineHeight: 100,
           fontSize: 25,
           textAlign: 'center',
       },
@@ -36,7 +36,6 @@
       }
   }
   let Layout = tglib.Layout.default;
-  Layout.init(template, style);
   let canvas = document.getElementById('canvas');
   let context = canvas.getContext('2d');
 
@@ -45,12 +44,37 @@
   canvas.style.height = 100 + 'px';
   canvas.width = 400;
   canvas.height = 200;
-  Layout.updateViewPort(canvas);
+  function getElementPagePosition(element) {
+      //计算x坐标
+      var actualLeft = element.offsetLeft;
+      var current = element.offsetParent;
+      while (current !== null) {
+        actualLeft += current.offsetLeft;
+        current = current.offsetParent;
+      }
+      //计算y坐标
+      var actualTop = element.offsetTop;
+      var current = element.offsetParent;
+      while (current !== null) {
+        actualTop += (current.offsetTop + current.clientTop);
+        current = current.offsetParent;
+      }
+      //返回结果
+      return { x: actualLeft, y: actualTop }
+    }
+  let pos = getElementPagePosition(canvas);
+  Layout.init(template, style);
+  Layout.updateViewPort({
+        x: pos.x,
+        y: pos.y,
+        width: canvas.offsetWidth,
+        height: canvas.offsetHeight,
+  });
   Layout.layout(context);
 
   const con = Layout.getElementsById('testText');
   let textView = con[0];
-  textView.on('touchstart', (e)=>console.log(e))
+  textView.on('click', (e)=>console.log(e))
   </script>
 </body>
 

@@ -101,7 +101,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _common_util_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(6);
 /* harmony import */ var _libs_fast_xml_parser_parser_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(7);
 /* harmony import */ var _libs_fast_xml_parser_parser_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_libs_fast_xml_parser_parser_js__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _components_index_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(13);
+/* harmony import */ var _common_bitMapFont__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(13);
+/* harmony import */ var _components_index_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(15);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -125,6 +126,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
  // components
 
  // 全局事件管道
@@ -133,10 +135,11 @@ var EE = new tiny_emitter__WEBPACK_IMPORTED_MODULE_2___default.a();
 var imgPool = new _common_pool_js__WEBPACK_IMPORTED_MODULE_1__["default"]('imgPool');
 var canvasPool = new _common_pool_js__WEBPACK_IMPORTED_MODULE_1__["default"]('canvasPool');
 var constructorMap = {
-  view: _components_index_js__WEBPACK_IMPORTED_MODULE_6__["View"],
-  text: _components_index_js__WEBPACK_IMPORTED_MODULE_6__["Text"],
-  image: _components_index_js__WEBPACK_IMPORTED_MODULE_6__["Image"],
-  scrollview: _components_index_js__WEBPACK_IMPORTED_MODULE_6__["ScrollView"]
+  view: _components_index_js__WEBPACK_IMPORTED_MODULE_7__["View"],
+  text: _components_index_js__WEBPACK_IMPORTED_MODULE_7__["Text"],
+  image: _components_index_js__WEBPACK_IMPORTED_MODULE_7__["Image"],
+  scrollview: _components_index_js__WEBPACK_IMPORTED_MODULE_7__["ScrollView"],
+  bitmaptext: _components_index_js__WEBPACK_IMPORTED_MODULE_7__["BitMapText"]
 };
 
 var create = function create(node, style) {
@@ -201,7 +204,9 @@ var getChildren = function getChildren(element) {
 
 var renderChildren = function renderChildren(dataArray, children, context) {
   dataArray.map(function (data) {
-    var child = children[data.id];
+    var child = children.find(function (item) {
+      return item.id === data.id;
+    });
 
     if (child.type === 'ScrollView') {
       // ScrollView的子节点渲染交给ScrollView自己，不支持嵌套ScrollView
@@ -217,7 +222,9 @@ function layoutChildren(dataArray, children) {
   var _this2 = this;
 
   dataArray.forEach(function (data) {
-    var child = children[data.id];
+    var child = children.find(function (item) {
+      return item.id === data.id;
+    });
     child.layoutBox = child.layoutBox || {};
     ['left', 'top', 'width', 'height'].forEach(function (prop) {
       child.layoutBox[prop] = data.layout[prop];
@@ -243,7 +250,9 @@ function layoutChildren(dataArray, children) {
 
 var updateRealLayout = function updateRealLayout(dataArray, children, scale) {
   dataArray.forEach(function (data) {
-    var child = children[data.id];
+    var child = children.find(function (item) {
+      return item.id === data.id;
+    });
     child.realLayoutBox = child.realLayoutBox || {};
     ['left', 'top', 'width', 'height'].forEach(function (prop) {
       child.realLayoutBox[prop] = data.layout[prop] * scale;
@@ -347,6 +356,7 @@ function (_Element) {
       realY: 0
     };
     _this3.state = _common_util_js__WEBPACK_IMPORTED_MODULE_4__["STATE"].UNINIT;
+    _this3.bitMapFonts = [];
     return _this3;
   }
   /**
@@ -373,11 +383,13 @@ function (_Element) {
     }
   }, {
     key: "init",
-    value: function init(template, style) {
+    value: function init(template, style, attrValueProcessor) {
       var start = new Date();
       /*if( parser.validate(template) === true) { //optional (it'll return an object in case it's not valid)*/
 
-      var jsonObj = _libs_fast_xml_parser_parser_js__WEBPACK_IMPORTED_MODULE_5___default.a.parse(template, {
+      /*}*/
+
+      var parseConfig = {
         attributeNamePrefix: "",
         attrNodeName: "attr",
         //default is 'false'
@@ -389,9 +401,13 @@ function (_Element) {
         parseAttributeValue: false,
         trimValues: true,
         parseTrueNumberOnly: false
-      }, true);
-      /*}*/
+      };
 
+      if (attrValueProcessor && typeof attrValueProcessor === "function") {
+        parseConfig.attrValueProcessor = attrValueProcessor;
+      }
+
+      var jsonObj = _libs_fast_xml_parser_parser_js__WEBPACK_IMPORTED_MODULE_5___default.a.parse(template, parseConfig, true);
       var xmlTree = jsonObj.children[0];
       this.debugInfo.xmlTree = new Date() - start; // XML树生成渲染树
 
@@ -411,7 +427,7 @@ function (_Element) {
       css_layout__WEBPACK_IMPORTED_MODULE_3___default()(elementTree);
       this.elementTree = elementTree;
       this.debugInfo.renderTree = new Date() - start;
-      var rootEle = this.children[Object.keys(this.children)[0]];
+      var rootEle = this.children[0];
 
       if (rootEle.style.width === undefined || rootEle.style.height === undefined) {
         console.error('Please set width and height property for root element');
@@ -573,7 +589,7 @@ function (_Element) {
 
       this.destroyAll();
       this.elementTree = null;
-      this.children = {};
+      this.children = [];
       this.layoutTree = {};
       this.state = _common_util_js__WEBPACK_IMPORTED_MODULE_4__["STATE"].CLEAR;
       Object.keys(canvasPool.pool).forEach(function (key) {
@@ -619,6 +635,12 @@ function (_Element) {
         img.onloadcbks = [];
         img.src = src;
       });
+    }
+  }, {
+    key: "registBitMapFont",
+    value: function registBitMapFont(name, src, config) {
+      var font = new _common_bitMapFont__WEBPACK_IMPORTED_MODULE_6__["default"](name, src, config);
+      this.bitMapFonts.push(font);
     }
   }]);
 
@@ -705,7 +727,7 @@ function () {
 
     _classCallCheck(this, Element);
 
-    this.children = {};
+    this.children = [];
     this.parent = null;
     this.parentId = 0;
     this.id = id;
@@ -792,7 +814,7 @@ function () {
     value: function add(element) {
       element.parent = this;
       element.parentId = this.id;
-      this.children[element.id] = element;
+      this.children.push(element);
     }
   }, {
     key: "emit",
@@ -3229,17 +3251,206 @@ function validateTagName(tagname, regxTagName) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _view_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(14);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BitMapFont; });
+/* harmony import */ var _util_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
+/* harmony import */ var _imageManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(14);
+/* harmony import */ var _pool__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+var bitMapPool = new _pool__WEBPACK_IMPORTED_MODULE_2__["default"]('bitMapPool');
+
+var Emitter = __webpack_require__(3);
+/**
+ * http://www.angelcode.com/products/bmfont/doc/file_format.html
+ */
+
+
+var BitMapFont =
+/*#__PURE__*/
+function () {
+  function BitMapFont(name, src, config) {
+    var _this = this;
+
+    _classCallCheck(this, BitMapFont);
+
+    var cache = bitMapPool.get(name);
+
+    if (cache) {
+      return cache;
+    }
+
+    this.config = config;
+    this.chars = this.parseConfig(config);
+    this.ready = false;
+    this.event = new Emitter();
+    this.texture = _imageManager__WEBPACK_IMPORTED_MODULE_1__["default"].loadImage(src, function () {
+      _this.ready = true;
+
+      _this.event.emit('text__load__done');
+    });
+    bitMapPool.set(name, this);
+  }
+
+  _createClass(BitMapFont, [{
+    key: "parseConfig",
+    value: function parseConfig(fntText) {
+      fntText = fntText.split("\r\n").join("\n");
+      var lines = fntText.split("\n");
+      var charsCount = this.getConfigByKey(lines[3], "count");
+      this.lineHeight = this.getConfigByKey(lines[1], 'lineHeight');
+      this.fontSize = this.getConfigByKey(lines[0], 'size');
+      console.log("font config", charsCount, this.lineHeight, this.fontSize);
+      var chars = {};
+
+      for (var i = 4; i < 4 + charsCount; i++) {
+        var charText = lines[i];
+        var letter = String.fromCharCode(this.getConfigByKey(charText, "id"));
+        var c = {};
+        chars[letter] = c;
+        c["x"] = this.getConfigByKey(charText, "x");
+        c["y"] = this.getConfigByKey(charText, "y");
+        c["w"] = this.getConfigByKey(charText, "width");
+        c["h"] = this.getConfigByKey(charText, "height");
+        c["offX"] = this.getConfigByKey(charText, "xoffset");
+        c["offY"] = this.getConfigByKey(charText, "yoffset");
+        c["xadvance"] = this.getConfigByKey(charText, "xadvance");
+      }
+
+      console.log(chars);
+      return chars;
+    }
+  }, {
+    key: "getConfigByKey",
+    value: function getConfigByKey(configText, key) {
+      var itemConfigTextList = configText.split(" ");
+
+      for (var i = 0, length = itemConfigTextList.length; i < length; i++) {
+        var itemConfigText = itemConfigTextList[i];
+
+        if (key === itemConfigText.substring(0, key.length)) {
+          var value = itemConfigText.substring(key.length + 1);
+          return parseInt(value);
+        }
+      }
+
+      return 0;
+    }
+  }]);
+
+  return BitMapFont;
+}();
+/*new BitMapFont()*/
+
+
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _pool__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+var imgPool = new _pool__WEBPACK_IMPORTED_MODULE_0__["default"]('imgPool');
+
+var ImageManager =
+/*#__PURE__*/
+function () {
+  function ImageManager() {
+    _classCallCheck(this, ImageManager);
+  }
+
+  _createClass(ImageManager, [{
+    key: "getRes",
+    value: function getRes(src) {
+      return imgPool.get(src);
+    }
+  }, {
+    key: "loadImage",
+    value: function loadImage(src) {
+      var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _util__WEBPACK_IMPORTED_MODULE_1__["none"];
+      var img = null;
+      var cache = this.getRes(src);
+
+      if (!src) {
+        return img;
+      } // 图片已经被加载过，直接返回图片并且执行回调
+
+
+      if (cache && cache.loadDone) {
+        img = cache;
+        callback();
+      } else if (cache && !cache.loadDone) {
+        // 图片正在加载过程中，返回图片并且等待图片加载完成执行回调
+        img = cache;
+        cache.onloadcbks.push(callback);
+      } else {
+        // 创建图片，将回调函数推入回调函数栈
+        img = Object(_util__WEBPACK_IMPORTED_MODULE_1__["createImage"])();
+        img.onloadcbks = [callback];
+        imgPool.set(src, img);
+
+        img.onload = function () {
+          img.onloadcbks.forEach(function (fn) {
+            return fn();
+          });
+          img.onloadcbks = [];
+          img.loadDone = true;
+        };
+
+        img.onerror = function (e) {
+          console.log('img load error', e);
+        };
+
+        img.src = src;
+      }
+
+      return img;
+    }
+  }]);
+
+  return ImageManager;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (new ImageManager());
+
+/***/ }),
+/* 15 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _view_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(16);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "View", function() { return _view_js__WEBPACK_IMPORTED_MODULE_0__["default"]; });
 
-/* harmony import */ var _image_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(15);
+/* harmony import */ var _image_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(17);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Image", function() { return _image_js__WEBPACK_IMPORTED_MODULE_1__["default"]; });
 
-/* harmony import */ var _text_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(16);
+/* harmony import */ var _text_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(18);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Text", function() { return _text_js__WEBPACK_IMPORTED_MODULE_2__["default"]; });
 
-/* harmony import */ var _scrollview_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(17);
+/* harmony import */ var _scrollview_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(19);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ScrollView", function() { return _scrollview_js__WEBPACK_IMPORTED_MODULE_3__["default"]; });
+
+/* harmony import */ var _bitmaptext_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(21);
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BitMapText", function() { return _bitmaptext_js__WEBPACK_IMPORTED_MODULE_4__["default"]; });
+
 
 
 
@@ -3248,7 +3459,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3374,7 +3585,7 @@ function (_Element) {
 
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3594,7 +3805,7 @@ function (_Element) {
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3799,15 +4010,15 @@ function (_Element) {
 
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ScrollView; });
-/* harmony import */ var _view_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(14);
+/* harmony import */ var _view_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(16);
 /* harmony import */ var _common_pool_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
-/* harmony import */ var _common_touch_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(18);
+/* harmony import */ var _common_touch_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(20);
 /* harmony import */ var _common_util_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -4119,8 +4330,7 @@ function (_View) {
   }, {
     key: "scrollHeight",
     get: function get() {
-      var ids = Object.keys(this.children);
-      var last = this.children[ids[ids.length - 1]];
+      var last = this.children[this.children.length - 1];
       return last.layoutBox.top + last.layoutBox.height;
     }
   }]);
@@ -4131,7 +4341,7 @@ function (_View) {
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4320,6 +4530,226 @@ function () {
 
 
 
+/***/ }),
+/* 21 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BitMapText; });
+/* harmony import */ var _elements_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var css_layout__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
+/* harmony import */ var css_layout__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(css_layout__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _common_bitMapFont__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(13);
+/* harmony import */ var _common_pool_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+
+
+var bitMapPool = new _common_pool_js__WEBPACK_IMPORTED_MODULE_3__["default"]('bitMapPool');
+
+var BitMapText =
+/*#__PURE__*/
+function (_Element) {
+  _inherits(BitMapText, _Element);
+
+  function BitMapText(opts) {
+    var _this;
+
+    _classCallCheck(this, BitMapText);
+
+    var _opts$style = opts.style,
+        style = _opts$style === void 0 ? {} : _opts$style,
+        _opts$props = opts.props,
+        props = _opts$props === void 0 ? {} : _opts$props,
+        _opts$idName = opts.idName,
+        idName = _opts$idName === void 0 ? '' : _opts$idName,
+        _opts$className = opts.className,
+        className = _opts$className === void 0 ? '' : _opts$className,
+        _opts$value = opts.value,
+        value = _opts$value === void 0 ? '' : _opts$value,
+        _opts$font = opts.font,
+        font = _opts$font === void 0 ? '' : _opts$font;
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(BitMapText).call(this, {
+      props: props,
+      idName: idName,
+      className: className,
+      style: style
+    }));
+    _this.type = "BitMapText";
+    _this.ctx = null;
+    _this.valuesrc = value;
+    _this.renderBoxes = [];
+    Object.defineProperty(_assertThisInitialized(_this), "value", {
+      get: function get() {
+        return this.valuesrc;
+      },
+      set: function set(newValue) {
+        if (newValue !== this.valuesrc) {
+          this.valuesrc = newValue;
+          this.emit('repaint');
+        }
+      },
+      enumerable: true,
+      configurable: true
+    });
+    _this.font = bitMapPool.get(font);
+
+    if (!_this.font) {
+      console.error('Please invoke API `registBitMapFont` before using `BitMapText`');
+    }
+
+    return _this;
+  }
+
+  _createClass(BitMapText, [{
+    key: "insert",
+    value: function insert(ctx, box) {
+      this.renderBoxes.push({
+        ctx: ctx,
+        box: box
+      });
+      this.render(ctx, box);
+    }
+  }, {
+    key: "repaint",
+    value: function repaint() {
+      var _this2 = this;
+
+      this.renderBoxes.forEach(function (item) {
+        _this2.render(item.ctx, item.box);
+      });
+    }
+  }, {
+    key: "render",
+    value: function render(ctx, layoutBox) {
+      var _this3 = this;
+
+      /*this.style.width = 200;
+      let tree = {
+          style: this.parent.style,
+          children: [
+              {
+                  style: this.style
+              }
+          ]
+      }
+       computeLayout(tree)
+      console.log(tree)*/
+      if (!this.font) {
+        return;
+      }
+
+      if (this.font.ready) {
+        this.renderText(ctx, layoutBox);
+      } else {
+        this.font.event.on('text__load__done', function () {
+          _this3.renderText(ctx, layoutBox);
+        });
+      }
+    }
+  }, {
+    key: "getTextBounds",
+    value: function getTextBounds() {
+      var style = this.style;
+      var _style$letterSpacing = style.letterSpacing,
+          letterSpacing = _style$letterSpacing === void 0 ? 0 : _style$letterSpacing;
+      var width = 0;
+      var offsetX = 0;
+      var offsetY = 0;
+
+      for (var i = 0, len = this.value.length; i < len; i++) {
+        var _char = this.value[i];
+        var cfg = this.font.chars[_char];
+
+        if (cfg) {
+          width += cfg.w;
+
+          if (i < len - 1) {
+            width += letterSpacing;
+          }
+        }
+      }
+
+      return {
+        width: width,
+        height: this.font.lineHeight
+      };
+    }
+  }, {
+    key: "renderText",
+    value: function renderText(ctx, layoutBox) {
+      var bounds = this.getTextBounds();
+      var defaultLineHeight = this.font.lineHeight;
+      ctx.save();
+      this.renderBorder(ctx, layoutBox);
+      var box = layoutBox || this.layoutBox;
+      var style = this.style;
+      var width = style.width,
+          height = style.height,
+          _style$lineHeight = style.lineHeight,
+          lineHeight = _style$lineHeight === void 0 ? defaultLineHeight : _style$lineHeight,
+          textAlign = style.textAlign,
+          textBaseline = style.textBaseline,
+          verticalAlign = style.verticalAlign; // 元素包围盒的左上角坐标
+
+      var x = box.absoluteX;
+      var y = box.absoluteY;
+      var scaleY = lineHeight / defaultLineHeight;
+      var realWidth = scaleY * bounds.width; // 如果文字的渲染区域高度小于盒子高度，采用对齐方式
+
+      if (lineHeight < height) {
+        if (verticalAlign === 'middle') {
+          y += (height - lineHeight) / 2;
+        } else if (verticalAlign === 'bottom') {
+          y = y + height - lineHeight;
+        }
+      }
+
+      if (width > realWidth) {
+        if (textAlign === 'center') {
+          x += (width - realWidth) / 2;
+        } else if (textAlign === 'right') {
+          x += width - realWidth;
+        }
+      }
+
+      for (var i = 0; i < this.value.length; i++) {
+        var _char2 = this.value[i];
+        var cfg = this.font.chars[_char2];
+
+        if (cfg) {
+          ctx.drawImage(this.font.texture, cfg.x, cfg.y, cfg.w, cfg.h, x + cfg.offX * scaleY, y + cfg.offY * scaleY, cfg.w * scaleY, cfg.h * scaleY);
+          x += cfg.w * scaleY;
+        }
+      }
+    }
+  }]);
+
+  return BitMapText;
+}(_elements_js__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+
+
 /***/ })
 /******/ ]);
+
 export default Layout.default;

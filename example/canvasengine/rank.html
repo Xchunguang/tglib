@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+  <div id="main">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <script src="../../dist/tglib.umd.js"></script>
+  <script>
+
+    let Layout = tglib.Layout.default;
+    let styleValue = {
+      container: {
+        width: 960,
+        height: 1410,
+        borderRadius: 12,
+      },
+
+      header: {
+        height: 120,
+        width: 960,
+        flexDirection: 'column',
+        alignItems: 'center',
+        backgroundColor: '#ffffff',
+        borderBottomWidth: 0.5,
+        borderColor: 'rgba(0, 0, 0, 0.3)',
+      },
+
+      title: {
+        width: 144,
+        fontSize: 48,
+        height: 120,
+        lineHeight: 50,
+        textAlign: 'center',
+        fontWeight: 'bold',
+        borderBottomWidth: 6,
+        borderColor: '#000000',
+      },
+
+      rankList: {
+        width: 960,
+        height: 1000,
+        backgroundColor: '#ffffff',
+      },
+
+      list: {
+        width: 960,
+        height: 950,
+        backgroundColor: '#ffffff',
+        marginTop: 30,
+      },
+
+      listItem: {
+        backgroundColor: '#F7F7F7',
+        width: 960,
+        height: 150,
+        flexDirection: 'row',
+        alignItems: 'center',
+      },
+
+      listItemOld: {
+        backgroundColor: '#ffffff',
+      },
+
+      listItemNum: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: '#452E27',
+        lineHeight: 45,
+        height: 150,
+        textAlign: 'center',
+        width: 120,
+      },
+
+      listHeadImg: {
+        borderRadius: 6,
+        width: 90,
+        height: 90,
+      },
+
+      listItemScore: {
+        fontSize: 48,
+        fontWeight: 'bold',
+        marginLeft: 10,
+        height: 150,
+        lineHeight: 150,
+        width: 300,
+        textAlign: 'right',
+      },
+
+      listItemName: {
+        fontSize: 36,
+        height: 150,
+        lineHeight: 150,
+        width: 350,
+        marginLeft: 30,
+      },
+
+      listScoreUnit: {
+        opacity: 0.5,
+        color: '#000000',
+        fontSize: 30,
+        height: 150,
+        lineHeight: 150,
+        marginLeft: 8,
+      },
+
+      selfListItem: {
+        borderRadius: 20,
+        marginTop: 50,
+        backgroundColor: '#ffffff',
+      },
+
+      listTips: {
+        width: 960,
+        height: 90,
+        lineHeight: 90,
+        textAlign: 'center',
+        fontSize: 30,
+        color: 'rgba(0,0,0,0.5)',
+        backgroundColor: '#ffffff',
+        borderRadius: 10,
+      }
+    }
+
+    // 创建mock数据
+    let item = {
+      nickname: "zim",
+      rankScore: 1,
+      avatarUrl: 'https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg',
+      starSum: 1,
+    };
+    let datasource = {
+      data: [],
+      selfIndex: 0,
+      self: item
+    }
+    for (let i = 0; i < 20; i++) {
+      var cp = JSON.parse(JSON.stringify(item));
+      cp.rankScore = Math.floor(Math.random() * 1000 + 1)
+      cp.starSum = i + 1;
+      datasource.data.push(cp);
+    }
+
+
+    let resultText = `
+	<view class="container" id="main"> <view class="header"> <bitmaptext font="fnt_number-export" class="title" value="等级"></bitmaptext> </view> <view class="rankList"> <scrollview class="list">    <view class="listItem">  <bitmaptext font="fnt_number-export" class="listItemNum" value="1"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="306"></text> <text class="listScoreUnit" value="分"></text> </view>   <view class="listItem listItemOld">   <bitmaptext font="fnt_number-export" class="listItemNum" value="2"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="964"></text> <text class="listScoreUnit" value="分"></text> </view>    <view class="listItem">  <bitmaptext font="fnt_number-export" class="listItemNum" value="3"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="764"></text> <text class="listScoreUnit" value="分"></text> </view>   <view class="listItem listItemOld">   <bitmaptext font="fnt_number-export" class="listItemNum" value="4"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="806"></text> <text class="listScoreUnit" value="分"></text> </view>    <view class="listItem">  <bitmaptext font="fnt_number-export" class="listItemNum" value="5"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="839"></text> <text class="listScoreUnit" value="分"></text> </view>   <view class="listItem listItemOld">   <bitmaptext font="fnt_number-export" class="listItemNum" value="6"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="623"></text> <text class="listScoreUnit" value="分"></text> </view>    <view class="listItem">  <bitmaptext font="fnt_number-export" class="listItemNum" value="7"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="130"></text> <text class="listScoreUnit" value="分"></text> </view>   <view class="listItem listItemOld">   <bitmaptext font="fnt_number-export" class="listItemNum" value="8"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="698"></text> <text class="listScoreUnit" value="分"></text> </view>    <view class="listItem">  <bitmaptext font="fnt_number-export" class="listItemNum" value="9"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="796"></text> <text class="listScoreUnit" value="分"></text> </view>   <view class="listItem listItemOld">   <bitmaptext font="fnt_number-export" class="listItemNum" value="10"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="809"></text> <text class="listScoreUnit" value="分"></text> </view>    <view class="listItem">  <bitmaptext font="fnt_number-export" class="listItemNum" value="11"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="999"></text> <text class="listScoreUnit" value="分"></text> </view>   <view class="listItem listItemOld">   <bitmaptext font="fnt_number-export" class="listItemNum" value="12"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="278"></text> <text class="listScoreUnit" value="分"></text> </view>    <view class="listItem">  <bitmaptext font="fnt_number-export" class="listItemNum" value="13"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="759"></text> <text class="listScoreUnit" value="分"></text> </view>   <view class="listItem listItemOld">   <bitmaptext font="fnt_number-export" class="listItemNum" value="14"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="845"></text> <text class="listScoreUnit" value="分"></text> </view>    <view class="listItem">  <bitmaptext font="fnt_number-export" class="listItemNum" value="15"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="143"></text> <text class="listScoreUnit" value="分"></text> </view>   <view class="listItem listItemOld">   <bitmaptext font="fnt_number-export" class="listItemNum" value="16"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="8"></text> <text class="listScoreUnit" value="分"></text> </view>    <view class="listItem">  <bitmaptext font="fnt_number-export" class="listItemNum" value="17"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="752"></text> <text class="listScoreUnit" value="分"></text> </view>   <view class="listItem listItemOld">   <bitmaptext font="fnt_number-export" class="listItemNum" value="18"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="128"></text> <text class="listScoreUnit" value="分"></text> </view>    <view class="listItem">  <bitmaptext font="fnt_number-export" class="listItemNum" value="19"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="630"></text> <text class="listScoreUnit" value="分"></text> </view>   <view class="listItem listItemOld">   <bitmaptext font="fnt_number-export" class="listItemNum" value="20"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="862"></text> <text class="listScoreUnit" value="分"></text> </view>  </scrollview> <text class="listTips" value="仅展示前50位好友排名"></text> <view class="listItem selfListItem"> <bitmaptext font="fnt_number-export" class="listItemNum" value="0"></bitmaptext> <image class="listHeadImg" src="https://res.wx.qq.com/wechatgame/product/webpack/userupload/20191119/wegoing.jpeg"></image> <text class="listItemName" value="zim"></text> <text class="listItemScore" value="862"></text> <text class="listScoreUnit" value="分"></text> </view> </view></view>
+`
+    // 获取元素的绝对位置坐标（像对于页面左上角）
+    function getElementPagePosition(element) {
+      //计算x坐标
+      var actualLeft = element.offsetLeft;
+      var current = element.offsetParent;
+      while (current !== null) {
+        actualLeft += current.offsetLeft;
+        current = current.offsetParent;
+      }
+      //计算y坐标
+      var actualTop = element.offsetTop;
+      var current = element.offsetParent;
+      while (current !== null) {
+        actualTop += (current.offsetTop + current.clientTop);
+        current = current.offsetParent;
+      }
+      //返回结果
+      return { x: actualLeft, y: actualTop }
+    }
+
+    let canvas = document.getElementById('canvas');
+    let context = canvas.getContext('2d');
+
+    // 设置canvas的尺寸和样式的container比例一致
+    canvas.style.width = 300 + 'px';
+    canvas.style.height = 1410 / 960 * 300 + 'px';
+    canvas.width = 960;
+    canvas.height = 1410;
+
+
+    Layout.registBitMapFont(
+      'fnt_number-export',
+      'https://res.wx.qq.com/wechatgame/product/webpack/userupload/20200314/fnt_number-export.png',
+      `info face="fnt_number-export" size=50 bold=0 italic=0 charset="" unicode=0 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1
+common lineHeight=60 base=26 scaleW=190 scaleH=181 pages=1 packed=0 alphaChnl=1 redChnl=0 greenChnl=0 blueChnl=0
+page id=0 file="fnt_number-export.png"
+chars count=15
+char id=31561 x=0 y=61 width=60 height=61 xoffset=0 yoffset=2 xadvance=57 page=0 chnl=0 letter="等"
+char id=32423 x=0 y=0 width=62 height=60 xoffset=0 yoffset=2 xadvance=59 page=0 chnl=0 letter="级"
+char id=46 x=168 y=116 width=21 height=21 xoffset=0 yoffset=39 xadvance=18 page=0 chnl=0 letter="."
+char id=49 x=145 y=0 width=27 height=57 xoffset=0 yoffset=3 xadvance=24 page=0 chnl=0 letter="1"
+char id=50 x=44 y=123 width=41 height=57 xoffset=0 yoffset=3 xadvance=38 page=0 chnl=0 letter="2"
+char id=51 x=102 y=58 width=40 height=57 xoffset=0 yoffset=3 xadvance=37 page=0 chnl=0 letter="3"
+char id=52 x=143 y=58 width=40 height=57 xoffset=0 yoffset=3 xadvance=37 page=0 chnl=0 letter="4"
+char id=53 x=0 y=123 width=43 height=57 xoffset=0 yoffset=3 xadvance=40 page=0 chnl=0 letter="5"
+char id=54 x=127 y=116 width=40 height=57 xoffset=0 yoffset=3 xadvance=37 page=0 chnl=0 letter="6"
+char id=55 x=86 y=119 width=40 height=57 xoffset=0 yoffset=3 xadvance=37 page=0 chnl=0 letter="7"
+char id=56 x=63 y=0 width=40 height=57 xoffset=0 yoffset=3 xadvance=37 page=0 chnl=0 letter="8"
+char id=57 x=104 y=0 width=40 height=57 xoffset=0 yoffset=3 xadvance=37 page=0 chnl=0 letter="9"
+char id=48 x=61 y=61 width=40 height=57 xoffset=0 yoffset=3 xadvance=37 page=0 chnl=0 letter="0"
+char id=32 x=0 y=0 width=0 height=0 xoffset=0 yoffset=0 xadvance=0 page=0 chnl=0 letter=" "
+char id=9 x=0 y=0 width=0 height=0 xoffset=0 yoffset=0 xadvance=0 page=0 chnl=0 letter="	"
+
+kernings count=0`
+    )
+    function init() {
+      let pos = getElementPagePosition(canvas);
+      // 每次初始化之前先执行清理逻辑保证内存不会一直增长
+      Layout.clear();
+      // 初始化引擎
+      Layout.init(resultText, styleValue);
+      Layout.updateViewPort({
+        x: pos.x,
+        y: pos.y,
+        width: canvas.offsetWidth,
+        height: canvas.offsetHeight,
+      });
+
+      Layout.layout(context);
+
+    }
+
+    init();
+    window.onresize = init;
+
+    const list = Layout.getElementsByClassName('listItem');
+
+    list.forEach(item => {
+      item.on('click', (e) => {
+        console.log(item.children[0].value);
+      });
+    });
+
+  </script>
+</body>
+
+</html>
