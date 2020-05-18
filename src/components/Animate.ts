@@ -1,7 +1,7 @@
 import { Object3D, Vector3, Euler } from "three";
 import {TweenMax} from 'gsap';
+import {Power0} from 'gsap';
 export {Power0, Power1, Power2, Power3, Power4, Linear, Quad, Cubic, Quart, Quint, Strong} from 'gsap';
-
 /**
  * 动画类型
  */

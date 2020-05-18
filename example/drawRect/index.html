@@ -54,7 +54,7 @@
 
     var canvas = document.createElement('canvas');
     let width = 100;
-    let height = 30;
+    let height = 60;
     canvas.width = width;
     canvas.height = height;
     var ctx = canvas.getContext('2d');
@@ -95,6 +95,12 @@
       radius = 0;
       drawRect();
     })
+
+    ctx.font = '18px 宋体';
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('hello', 100 / 2, 30);
   </script>
 </body>
 

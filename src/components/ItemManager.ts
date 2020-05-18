@@ -287,6 +287,7 @@ export class CanvasItem extends Item {
   position: Vector3
   constructor(position: Vector3, width: number, height: number, canvas: any) {
     let texture = new CanvasTexture(canvas)
+    texture.needsUpdate = true
     let material = new MeshBasicMaterial({
       map: texture
     })

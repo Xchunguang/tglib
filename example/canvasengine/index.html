@@ -8,19 +8,20 @@
 
   <script src="../../dist/tglib.umd.js"></script>
   <script>
-    let template = `<view id="container"><text id="testText" class="redText" value="hello canvas"></text></view>`
+    let template = `<view id="container">
+      <text id="testText" class="redText" value="hello canvas"></text>
+      <image class="image" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1589172928742&di=f6852b87ef417b0bd9d320f89a3cb6de&imgtype=0&src=http%3A%2F%2Fa0.att.hudong.com%2F64%2F76%2F20300001349415131407760417677.jpg"></image>
+    </view>`
     let style = {
       container: {
-          width: 200,
-          height: 100,
+          width: 400,
+          height: 200,
           backgroundColor: '#ccc',
           justContent: 'center',
           alignItems: 'center',
           borderRadius: 50,
           borderColor: 'red',
           borderWidth: 0,
-          marginTop: 30,
-          marginLeft: 30,
       },
       testText: {
           color: '#ffffff',
@@ -33,6 +34,13 @@
       // 文字的最终颜色为#ff0000
       redText: {
           color: '#ff0000',
+      },
+      image: {
+        width: 100,
+        height: 100,
+        marginLeft: 30,
+        marginTop: 30,
+        borderRadius: 20
       }
   }
   let Layout = tglib.Layout.default;
@@ -40,8 +48,8 @@
   let context = canvas.getContext('2d');
 
   // 设置canvas的尺寸和样式的container比例一致
-  canvas.style.width = 200 + 'px';
-  canvas.style.height = 100 + 'px';
+  canvas.style.width = 400 + 'px';
+  canvas.style.height = 200 + 'px';
   canvas.width = 400;
   canvas.height = 200;
   function getElementPagePosition(element) {
