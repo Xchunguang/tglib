@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+  <div id="main">
+
+  </div>
+  <script>
+    var canvas = document.createElement('canvas');
+    let width = 400;
+    let height = 200;
+    let radius = 10;
+    canvas.width = width;
+    canvas.height = height;
+    var ctx = canvas.getContext('2d');
+    var imageUrl = 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1589172928742&di=f6852b87ef417b0bd9d320f89a3cb6de&imgtype=0&src=http%3A%2F%2Fa0.att.hudong.com%2F64%2F76%2F20300001349415131407760417677.jpg';
+
+    function roundedRect(ctx, x, y, width, height, radius) {
+        ctx.strokeStyle = "#fff";
+        ctx.beginPath();
+        ctx.moveTo(x, y + radius);
+        ctx.lineTo(x, y + height - radius);
+        ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
+        ctx.lineTo(x + width - radius, y + height);
+        ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
+        ctx.lineTo(x + width, y + radius);
+        ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
+        ctx.lineTo(x + radius, y);
+        ctx.quadraticCurveTo(x, y, x, y + radius);
+        ctx.stroke();
+    }
+
+    ctx.save();
+    ctx.beginPath();
+    roundedRect(ctx, 0, 0, width, height, radius);
+    ctx.clip();  // 通过裁剪得到圆角矩形
+
+    var image = new Image();
+    image.src = imageUrl;
+    image.onload = function(){
+      ctx.drawImage(image, 0, 0, 3507, 2175, 0, 0, width, height)
+    }
+    document.getElementById('main').appendChild(canvas);
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+  <div id="main">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <script src="../../dist/tglib.umd.js"></script>
+  <script>
+
+    var requestAnimFrame = function () {
+      return (
+        this.requestAnimationFrame ||
+        this.mozRequestAnimationFrame ||
+        this.oRequestAnimationFrame ||
+        this.msRequestAnimationFrame ||
+        function (callback) {
+          this.setTimeout(callback, 1000 / 60);
+        }
+      );
+    }();
+
+    let width = 1920;
+    let height = 1080;
+
+    let canvas = document.getElementById('canvas');
+    let radio = 1.5;
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    canvas.width = 1920 * radio;
+    canvas.height = 1080 * radio;
+
+
+    let { Control, CreateUtil, THREE, ItemManager, UIComp } = tglib;
+    let { ImageButton, TextButton,Icon } = UIComp;
+    let color = new THREE.Color(0xd4dde4);
+    let stage = {
+      scene: CreateUtil.createScene(CreateUtil.createFog(0xcce0ff, 500, 10000), color),
+      camera: CreateUtil.createPerspectiveCamera(30, width / height, 1, 2000)
+    }
+    let hudStage = {
+      scene: CreateUtil.createScene(),
+      camera: CreateUtil.createHudCamera(-width / 2, width / 2, height / 2, -height / 2, -100, 100)
+    }
+    hudStage.camera.lookAt(0,0,0)
+    let control = new Control(canvas, stage, hudStage);
+
+    let itemManager = new ItemManager(control);
+
+    let config = {
+      background: 'white',
+      borderColor: 'red',
+      borderWidth: 10,
+      borderRadius: 10,
+      onclick: ()=>console.log('btn click')
+    }
+    let textButton = new TextButton('按钮', 'black', 10, document.createElement('canvas'), new THREE.Vector3(-100,50,0), 200 , 100 , config);
+    itemManager.addHudItem(textButton);
+
+    let icon = null;
+    let image = new Image();
+    image.src = './image/timg.jpg';
+    let imageButton = null;
+    let imageId = "1";
+    image.onload = function(){
+      let createCavnasFunc = function(){
+        return document.createElement('canvas');
+      }
+      icon = new Icon(image, [{id: imageId, width: 1920, height: 1080, left: 0,top: 0}], createCavnasFunc);
+      imageButton = new ImageButton(icon, imageId, new THREE.Vector3(0,0,0), 1920 , 1080 , radio, config );
+      // itemManager.addHudItem(imageButton);
+
+      itemManager.addHudItem(icon.createIcon(imageId, new THREE.Vector3(0,0,0), radio))
+    }
+
+    let animate = function(){
+      requestAnimFrame(animate.bind(this));
+      control.update();
+    }
+    animate();
+
+  </script>
+</body>
+
+</html>

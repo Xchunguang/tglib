@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+  <div id="main">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <script src="../../dist/tglib.umd.js"></script>
+  <script>
+
+    var requestAnimFrame = function () {
+      return (
+        this.requestAnimationFrame ||
+        this.mozRequestAnimationFrame ||
+        this.oRequestAnimationFrame ||
+        this.msRequestAnimationFrame ||
+        function (callback) {
+          this.setTimeout(callback, 1000 / 60);
+        }
+      );
+    }();
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    let canvas = document.getElementById('canvas');
+    let radio = 1.5;
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    canvas.width = width * radio;
+    canvas.height = height * radio;
+
+
+    let { Control, CreateUtil, THREE, ItemManager, UIComp } = tglib;
+    let { ImageButton, TextButton,Icon,TextToast } = UIComp;
+    let color = new THREE.Color(0xd4dde4);
+    let stage = {
+      scene: CreateUtil.createScene(CreateUtil.createFog(0xcce0ff, 500, 10000), color),
+      camera: CreateUtil.createPerspectiveCamera(30, width / height, 1, 2000)
+    }
+    let hudStage = {
+      scene: CreateUtil.createScene(),
+      camera: CreateUtil.createHudCamera(-width / 2, width / 2, height / 2, -height / 2, -100, 100)
+    }
+    hudStage.camera.lookAt(0,0,0)
+    let control = new Control(canvas, stage, hudStage);
+
+    let itemManager = new ItemManager(control);
+
+    var createCanvas = function(){
+      return document.createElement('canvas');
+    }
+
+    let toast = new TextToast(control, createCanvas);
+    toast.show('hello');
+
+    let animate = function(){
+      requestAnimFrame(animate.bind(this));
+      control.update();
+    }
+    animate();
+
+  </script>
+</body>
+
+</html>
