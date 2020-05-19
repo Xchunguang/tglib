@@ -7,7 +7,7 @@ import json from 'rollup-plugin-json'
 
 const pkg = require('./package.json')
 
-const libraryName = 'tglib'
+const libraryName = 'threeglib'
 
 export default {
   input: `src/${libraryName}.ts`,

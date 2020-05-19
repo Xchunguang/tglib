@@ -3,15 +3,15 @@
   "version": "0.0.1",
   "description": "",
   "keywords": [],
-  "main": "dist/tglib.umd.js",
-  "module": "dist/tglib.es5.js",
-  "typings": "dist/types/tglib.d.ts",
+  "main": "dist/threeglib.umd.js",
+  "module": "dist/threeglib.es5.js",
+  "typings": "dist/types/threeglib.d.ts",
   "files": [
     "dist"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Xchunguang/tglib"
+    "url": "https://github.com/Xchunguang/threeglib"
   },
   "license": "Apache 2.0",
   "engines": {
